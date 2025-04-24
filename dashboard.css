@@ -4,8 +4,9 @@
     box-sizing: border-box;
     font-family: 'Poppins',sans-serif;
 }
+
 body{
     width: 100%;
-    background: rgb(220, 93, 30);
+    background: #E5E7EB;
     position: relative;
 }
