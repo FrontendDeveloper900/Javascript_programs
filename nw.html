@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cat Litter Stock Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* --- SAME CSS AS BEFORE --- */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .search-container {
+      width: 50%;
+      margin: 0 auto 20px auto;
+      position: relative;
+    }
+    .search-container input {
+      width: 100%;
+      padding: 12px 40px 12px 20px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      font-size: 16px;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .search-container i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 15px;
+      text-align: center;
+    }
+    th {
+      background: green;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #e3f2fd;
+    }
+    .actions button {
+      margin: 3px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: white;
+    }
+    .edit-btn {
+      background-color: #2196F3;
+    }
+    .edit-btn:hover {
+      background-color: #0b7dda;
+    }
+    .delete-btn {
+      background-color: #f44336;
+    }
+    .delete-btn:hover {
+      background-color: #da190b;
+    }
+    .add-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: yellow;
+      color: black;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .add-btn:hover {
+      background: linear-gradient(135deg, #0072ff, #00c6ff);
+    }
+    .sort-icon {
+      margin-left: 5px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<h1><i class="fas fa-boxes-stacked"></i> Cat Litter Stock Dashboard</h1>
+
+<div class="search-container">
+  <input type="text" id="searchBar" onkeyup="searchTable()" placeholder="Search by Item Name...">
+  <i class="fas fa-search"></i>
+</div>
+
+<table id="stockTable">
+  <thead>
+    <tr>
+      <th onclick="sortTable()">Item Name <i id="sortIcon" class="fas fa-sort sort-icon"></i></th>
+      <th>Available Stock</th>
+      <th>Sale</th>
+      <th>New Stock Added</th>
+      <th>Weight</th>
+      <th>Flavour</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Dynamic data will come here -->
+  </tbody>
+</table>
+
+<div style="text-align: center;">
+  <button class="add-btn" onclick="addNewItem()">
+    <i class="fas fa-plus"></i> Add New Item
+  </button>
+</div>
+
+<script>
+let stockData = JSON.parse(localStorage.getItem('stockData')) || [];
+let sortAsc = true;
+
+function saveData() {
+  localStorage.setItem('stockData', JSON.stringify(stockData));
+}
+
+function renderTable() {
+  const tbody = document.getElementById('stockTable').getElementsByTagName('tbody')[0];
+  tbody.innerHTML = "";
+
+  stockData.forEach((item, index) => {
+    const row = tbody.insertRow();
+    row.insertCell(0).innerText = item.name;
+    row.insertCell(1).innerText = item.availableStock;
+    row.insertCell(2).innerText = item.sold;
+    row.insertCell(3).innerText = item.newStock;
+    row.insertCell(4).innerText = item.weight;
+    row.insertCell(5).innerText = item.flavour;
+
+    const actionCell = row.insertCell(6);
+    actionCell.classList.add('actions');
+    actionCell.innerHTML = `
+      <button class="edit-btn" onclick="editItem(${index})">
+        <i class="fas fa-pen"></i> Edit
+      </button>
+      <button class="delete-btn" onclick="deleteItem(${index})">
+        <i class="fas fa-trash"></i> Delete
+      </button>
+    `;
+  });
+}
+
+function addNewItem() {
+  const name = prompt("Enter Item Name:");
+  const availableStock = prompt("Enter Available Stock:");
+  const sold = prompt("Enter Sold Units:");
+  const newStock = prompt("Enter New Stock Added:");
+  
+  let weight = prompt("Select Weight: 5kg, 10kg, 25kg (type exactly)");
+  if (!["5kg", "10kg", "25kg"].includes(weight)) {
+    alert("Invalid weight. Please enter 5kg, 10kg, or 25kg.");
+    return;
+  }
+
+  const flavour = prompt("Enter Flavour:");
+
+  if (name && availableStock && sold && newStock && weight && flavour) {
+    const newItem = {
+      name,
+      availableStock,
+      sold,
+      newStock,
+      weight,
+      flavour
+    };
+    stockData.push(newItem);
+    saveData();
+    renderTable();
+  } else {
+    alert("All fields are required!");
+  }
+}
+
+function editItem(index) {
+  const item = stockData[index];
+  const name = prompt("Edit Item Name:", item.name);
+  const availableStock = prompt("Edit Available Stock:", item.availableStock);
+  const sold = prompt("Edit Sold Units:", item.sold);
+  const newStock = prompt("Edit New Stock Added:", item.newStock);
+  
+  let weight = prompt("Edit Weight (5kg, 10kg, 25kg):", item.weight);
+  if (!["5kg", "10kg", "25kg"].includes(weight)) {
+    alert("Invalid weight. Please enter 5kg, 10kg, or 25kg.");
+    return;
+  }
+
+  const flavour = prompt("Edit Flavour:", item.flavour);
+
+  if (name && availableStock && sold && newStock && weight && flavour) {
+    stockData[index] = {
+      name,
+      availableStock,
+      sold,
+      newStock,
+      weight,
+      flavour
+    };
+    saveData();
+    renderTable();
+  } else {
+    alert("All fields are required!");
+  }
+}
+
+function deleteItem(index) {
+  if (confirm("Are you sure you want to delete this item?")) {
+    stockData.splice(index, 1);
+    saveData();
+    renderTable();
+  }
+}
+
+function searchTable() {
+  const input = document.getElementById('searchBar').value.toUpperCase();
+  const table = document.getElementById('stockTable');
+  const tr = table.getElementsByTagName('tr');
+
+  for (let i = 1; i < tr.length; i++) {
+    const td = tr[i].getElementsByTagName('td')[0];
+    if (td) {
+      const textValue = td.textContent || td.innerText;
+      tr[i].style.display = textValue.toUpperCase().includes(input) ? "" : "none";
+    }
+  }
+}
+
+function sortTable() {
+  stockData.sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+    if (nameA < nameB) return sortAsc ? -1 : 1;
+    if (nameA > nameB) return sortAsc ? 1 : -1;
+    return 0;
+  });
+  sortAsc = !sortAsc;
+  document.getElementById('sortIcon').className = sortAsc ? 'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon';
+  renderTable();
+}
+
+// Initial render
+renderTable();
+
+function addNewItem() {
+  const name = prompt("Enter Item Name:");
+  const availableStock = prompt("Enter Available Stock:") || "0";
+  const sold = prompt("Enter Sold Units:") || "0";
+  const newStock = prompt("Enter New Stock Added:") || "0";
+  
+  let weight = prompt("Select Weight: 5kg, 10kg, 25kg (type exactly)");
+  if (!["5kg", "10kg", "25kg"].includes(weight)) {
+    alert("Invalid weight. Please enter 5kg, 10kg, or 25kg.");
+    return;
+  }
+
+  const flavour = prompt("Enter Flavour:") || "";
+
+  if (name && weight && flavour) {
+    const newItem = {
+      name,
+      availableStock,
+      sold,
+      newStock,
+      weight,
+      flavour
+    };
+    stockData.push(newItem);
+    saveData();
+    renderTable();
+  } else {
+    alert("Item Name, Weight aur Flavour zaroori hai!");
+  }
+}
+
+function editItem(index) {
+  const item = stockData[index];
+  const name = prompt("Edit Item Name:", item.name);
+  const availableStock = prompt("Edit Available Stock:", item.availableStock) || "0";
+  const sold = prompt("Edit Sold Units:", item.sold) || "0";
+  const newStock = prompt("Edit New Stock Added:", item.newStock) || "0";
+  
+  let weight = prompt("Edit Weight (5kg, 10kg, 25kg):", item.weight);
+  if (!["5kg", "10kg", "25kg"].includes(weight)) {
+    alert("Invalid weight. Please enter 5kg, 10kg, or 25kg.");
+    return;
+  }
+
+  const flavour = prompt("Edit Flavour:", item.flavour) || "";
+
+  if (name && weight && flavour) {
+    stockData[index] = {
+      name,
+      availableStock,
+      sold,
+      newStock,
+      weight,
+      flavour
+    };
+    saveData();
+    renderTable();
+  } else {
+    alert("Item Name, Weight aur Flavour zaroori hai!");
+  }
+}
+
+</script>
+
+</body>
+</html>
