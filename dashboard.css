@@ -15,7 +15,7 @@ body{
 #menu{
     background: rgb(20, 20, 52);
     width:300px;
-    height:832px;
+    height:932px;
 }
 
 #menu .logo{
@@ -124,7 +124,7 @@ body{
 .i-name{
     color:rgb(255, 68, 0);
     padding: 30px 30px 0 30px;
-    font-size: 24;
+    font-size:34px;
     font-weight: 700;
 }
 .card {
@@ -198,3 +198,74 @@ body{
     top:-338px;    
 }
 
+.dashboard {
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow-x: auto;
+  }
+
+  .dashboard h2 {
+    padding: 1rem;
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #f1f1f1;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 15px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #555;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+  }
+
+  tbody tr:hover {
+    background-color: #fafafa;
+  }
+
+  tbody td {
+    padding: 15px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+  }
+
+  .status.active {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .status.inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .status.pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
