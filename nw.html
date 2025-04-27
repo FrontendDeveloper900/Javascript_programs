@@ -5,7 +5,7 @@
 <title>Cat Litter Stock Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-
+/* --- SAME CSS AS BEFORE --- */
 body {
     font-family: 'Poppins', sans-serif;
     background: #f5f7fa;
@@ -100,7 +100,7 @@ h1 {
     text-align: center;
 }
 
-
+/* PAGINATION STYLE */
 .pagination {
     margin-top: 20px;
     text-align: center;
@@ -126,6 +126,56 @@ h1 {
 .pagination .arrow {
     font-weight: bold;
 }
+
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 10; 
+  left: 0; top: 0; 
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5); 
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+h2{
+    text-align: center;
+    margin-bottom: 20px;
+}
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px; right: 20px;
+  font-size: 25px;
+  cursor: pointer;
+}
+.update {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -141,7 +191,7 @@ h1 {
     <thead>
         <tr>
             <th onclick="sortTable()">Item Name <i id="sortIcon" class="fas fa-sort sort-icon"></i></th>
-            <th>Available Stock</th>
+            <th>Stock Quantity</th>
             <th>Sale</th>
             <th>New Stock Added</th>
             <th>Weight</th>
@@ -150,6 +200,7 @@ h1 {
         </tr>
     </thead>
     <tbody>
+        <!-- Dynamic data will come here -->
     </tbody>
 </table>
 
@@ -160,6 +211,73 @@ h1 {
         <i class="fas fa-plus"></i> Add New Item
     </button>
 </div>
+<!-- Modal Form -->
+<div id="formModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:30px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+      <h2 style="text-align:center;">Add New Item</h2>
+      <form id="newItemForm">
+        <input type="text" id="itemName" placeholder="Item Name" required style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="number" id="quantity" placeholder="Quantity" required style="width:100%; padding:10px; margin-bottom:10px;">
+        
+        <select id="flavourSelect" required style="width:100%; padding:10px; margin-bottom:10px;">
+          <option value="" disabled selected>Select Flavour</option>
+          <option value="Lemon">Lemon</option>
+          <option value="Babypowder">Babypowder</option>
+          <option value="Apple">Apple</option>
+          <option value="Coffee">Coffee</option>
+          <option value="Lavender">Lavender</option>
+        </select>
+  
+        <select id="weightSelect" required style="width:100%; padding:10px; margin-bottom:10px;">
+          <option value="" disabled selected>Select Weight</option>
+          <option value="5kg">5kg</option>
+          <option value="10kg">10kg</option>
+          <option value="25kg">25kg</option>
+        </select>
+  
+        <div style="text-align:center;">
+          <button type="submit" style="background:green; color:white; padding:10px 20px; border:none; border-radius:5px;">Save</button>
+          <button type="button" onclick="closeModal()" style="background:red; color:white; padding:10px 20px; border:none; border-radius:5px; margin-left:10px;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+
+<!-- Edit Form Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h2>Edit Item</h2>
+      <form id="editForm">
+        <input type="text" id="editItemName" placeholder="Item Name" required><br><br>
+        <input type="number" id="editStockQuantity" placeholder="Stock Quantity" required><br><br>
+        <input type="number" id="editSold" placeholder="Sold" required><br><br>
+        <input type="number" id="editNewStock" placeholder="New Stock Added" required><br><br>
+        <select id="editWeightSelect" required>
+          <option value="">Select Weight</option>
+          <option value="5kg">5kg</option>
+          <option value="10kg">10kg</option>
+          <option value="25kg">25kg</option>
+        </select><br><br>
+        <select id="editFlavourSelect" required>
+          <option value="">Select Flavour</option>
+          <option value="Lavender">Lavender</option>
+          <option value="Lemon">Lemon</option>
+          <option value="Rose">Rose</option>
+        </select><br><br>
+        <button type="submit" class="update">✏Update</button>
+      </form>
+    </div>
+  </div>
+  
+  
+
+
+
+
+
+
 
 <script>
 let stockData = JSON.parse(localStorage.getItem('stockData')) || [];
@@ -241,27 +359,53 @@ function renderPagination() {
 }
 
 function addNewItem() {
-    const name = prompt("Enter Item Name:");
-    const availableStock = prompt("Enter Available Stock:") || "0";
-    const sold = prompt("Enter Sold Units:") || "0";
-    const newStock = prompt("Enter New Sale Added:") || "0";
-    let weight = prompt("Select Weight: 5kg, 10kg, 25kg (type exactly)");
-    if (!["5kg", "10kg", "25kg"].includes(weight)) {
-        alert("Invalid weight. Please enter 5kg, 10kg, or 25kg.");
+    document.getElementById('formModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('formModal').style.display = 'none';
+}
+
+document.getElementById('newItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('itemName').value.trim();
+    const quantity = document.getElementById('quantity').value.trim();
+    const flavour = document.getElementById('flavourSelect').value;
+    const weight = document.getElementById('weightSelect').value;
+
+    if (!name || !quantity || !flavour || !weight) {
+        alert("Please fill all fields correctly.");
         return;
     }
-    const flavour = prompt("Enter Flavour:") || "";
+
+    const newItem = {
+        name,
+        availableStock: quantity,
+        sold: "0",
+        newStock: "0",
+        weight,
+        flavour
+    };
+
+    stockData.push(newItem);
+    saveData();
+    closeModal();
+    currentPage = Math.ceil(stockData.length / rowsPerPage); // jump to last page
+    renderTable();
+});
+    const flavour = "";
 
     if (name && weight && flavour) {
         const newItem = { name, availableStock, sold, newStock, weight, flavour };
         stockData.push(newItem);
         saveData();
-        currentPage = Math.ceil(stockData.length / rowsPerPage); 
+        currentPage = Math.ceil(stockData.length / rowsPerPage); // jump to last page
         renderTable();
     } else {
-        alert("Item Name, Weight aur Flavour zaroori hai!");
+        // alert("");
     }
-}
+
 
 function editItem(index) {
     const item = stockData[index];
@@ -281,7 +425,7 @@ function editItem(index) {
         saveData();
         renderTable();
     } else {
-        alert("Please Item Name, Weight and Flavour Add");
+        alert("Item Name, Weight aur Flavour ");
     }
 }
 
@@ -299,7 +443,7 @@ function deleteItem(index) {
 function searchTable() {
     const input = document.getElementById('searchBar').value.toUpperCase();
     const table = document.getElementById('stockTable');
-    const tr = table.getElementsByTagName('tr');
+    const tr = nw.getElementsByTagName('tr');
     for (let i = 1; i < tr.length; i++) {
         const td = tr[i].getElementsByTagName('td')[0];
         if (td) {
@@ -322,87 +466,52 @@ function sortTable() {
     renderTable();
 }
 
+
+let editingIndex = null; // Kaunsa item edit ho raha hai save karne ke liye
+
+function editItem(index) {
+    editingIndex = index; // Global variable mein save
+    const item = stockData[index];
+
+    // Existing Data ko Form mein bhar do
+    document.getElementById('editItemName').value = item.name;
+    document.getElementById('editStockQuantity').value = item.availableStock;
+    document.getElementById('editSold').value = item.sold;
+    document.getElementById('editNewStock').value = item.newStock;
+    document.getElementById('editWeightSelect').value = item.weight;
+    document.getElementById('editFlavourSelect').value = item.flavour;
+
+    // Modal show karo
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+// Form submit hone par data update karna
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Get Updated Values
+    const updatedItem = {
+        name: document.getElementById('editItemName').value.trim(),
+        availableStock: document.getElementById('editStockQuantity').value.trim(),
+        sold: document.getElementById('editSold').value.trim(),
+        newStock: document.getElementById('editNewStock').value.trim(),
+        weight: document.getElementById('editWeightSelect').value,
+        flavour: document.getElementById('editFlavourSelect').value,
+    };
+
+    // Update in stockData
+    stockData[editingIndex] = updatedItem;
+    saveData();
+    renderTable();
+    closeEditModal();
+});
+
+// Initial render
 renderTable();
-function searchTable() {
-    const input = document.getElementById('searchBar').value.trim().toUpperCase();
-    const tbody = document.getElementById('stockTable').getElementsByTagName('tbody')[0];
-
-    if (input === "") {
-        document.getElementById('pagination').style.display = "block";
-        renderTable();
-        return;
-    }
-
-    document.getElementById('pagination').style.display = "none";
-    tbody.innerHTML = "";
-
-    const filteredData = stockData.filter(item =>
-        item.name.toUpperCase().includes(input)
-    );
-
-    filteredData.forEach(item => {
-        const row = tbody.insertRow();
-        row.insertCell(0).innerText = item.name;
-        row.insertCell(1).innerText = item.availableStock;
-        row.insertCell(2).innerText = item.sold;
-        row.insertCell(3).innerText = item.newStock;
-        row.insertCell(4).innerText = item.weight;
-        row.insertCell(5).innerText = item.flavour;
-        const actionCell = row.insertCell(6);
-        actionCell.classList.add('actions');
-        const idx = stockData.indexOf(item);
-        actionCell.innerHTML = `
-            <button class="edit-btn" onclick="editItem(${idx})">
-                <i class="fas fa-pen"></i> Edit
-            </button>
-            <button class="delete-btn" onclick="deleteItem(${idx})">
-                <i class="fas fa-trash"></i> Delete
-            </button>
-        `;
-    });
-}
-function searchTable() {
-    const input = document.getElementById('searchBar').value.trim().toUpperCase();
-    const tbody = document.getElementById('stockTable').getElementsByTagName('tbody')[0];
-
-    if (input === "") {
-        document.getElementById('pagination').style.display = "block";
-        renderTable();
-        return;
-    }
-
-   
-    document.getElementById('pagination').style.display = "none";
-    tbody.innerHTML = "";
-
-    const filteredData = stockData.filter(item =>
-        item.name.toUpperCase().includes(input)
-    );
-
-   
-    filteredData.forEach(item => {
-        const row = tbody.insertRow();
-        row.insertCell(0).innerText = item.name;
-        row.insertCell(1).innerText = item.availableStock;
-        row.insertCell(2).innerText = item.sold;
-        row.insertCell(3).innerText = item.newStock;
-        row.insertCell(4).innerText = item.weight;
-        row.insertCell(5).innerText = item.flavour;
-        const actionCell = row.insertCell(6);
-        actionCell.classList.add('actions');
-        // index के लिए global index lookup करो
-        const idx = stockData.indexOf(item);
-        actionCell.innerHTML = `
-            <button class="edit-btn" onclick="editItem(${idx})">
-                <i class="fas fa-pen"></i> Edit
-            </button>
-            <button class="delete-btn" onclick="deleteItem(${idx})">
-                <i class="fas fa-trash"></i> Delete
-            </button>
-        `;
-    });
-}
-
 
 </script>
 

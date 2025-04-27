@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Table Page</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #e0e0e0;
+      padding: 20px;
+      text-align: center;
+    }
+    table {
+      width: 80%;
+      margin: auto;
+      background: white;
+      border-collapse: collapse;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📋 Items Table</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Detail Item</th>
+      <th>Weight</th>
+      <th>Quantity</th>
+      <th>Flavour</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    <!-- Yahan data aayega -->
+  </tbody>
+</table>
+
+<script>
+  // LocalStorage se data laa rahe hain
+  const items = JSON.parse(localStorage.getItem('items')) || [];
+  const tableBody = document.getElementById('tableBody');
+
+  items.forEach(item => {
+    const row = document.createElement('tr');
+
+    row.innerHTML = `
+      <td>${item.detailItem}</td>
+      <td>${item.weight}</td>
+      <td>${item.quantity}</td>
+      <td>${item.flavour}</td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+</script>
+
+</body>
+</html>

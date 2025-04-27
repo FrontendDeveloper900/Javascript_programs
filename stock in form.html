@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add New Item - Cat Litter Stock</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    margin: 0;
+}
+.top-bar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: bold;
+}
+form {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 450px;
+    margin-top: 50px;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+input, select {
+    width: 60%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-left:70px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+button:hover {
+    background: #0056b3;
+}
+.l1{
+    position: relative;
+    top:30px;
+    right:18px;
+}
+.l2{
+    position: relative;
+    top:30px;
+    right:20px;
+}
+.l3{
+    position: relative;
+    top:30px;
+    right:18px;
+}
+.l4{
+    position: relative;
+    top: 30px;
+    right:18px;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div id="srNumber">SR# 121</div>
+    <div id="dateTime"></div>
+</div>
+
+<form id="addItemForm">
+    <h2>Add New Cat Litter Item</h2>
+    <div class="l1">
+        <label for="name">Item Name</label>
+    </div>
+    <input type="text" id="name" required>
+
+    <div class="l2">
+        <label for="availableStock">(Quantity)</label>
+    </div>    
+        <input type="number" id="availableStock" min="0" required>
+    
+    
+    <div class="l3">
+        <label for="flavour">Flavour</label>
+    </div>
+    <select id="flavour" required>
+        <option value="">--Select Flavour--</option>
+        <option value="Lemon">Lemon</option>
+        <option value="Baby Powder">Baby Powder</option>
+        <option value="Apple">Apple</option>
+        <option value="Coffee">Coffee</option>
+        <option value="Lavender">Lavender</option>
+    </select>
+    
+
+    <div class="l4">
+        <label for="weight">Weight</label>
+    </div>  
+    <select id="weight" required>
+        <option value="">--Select Weight--</option>
+        <option value="5kg">5kg</option>
+        <option value="10kg">10kg</option>
+        <option value="25kg">25kg</option>
+    </select>
+    
+
+    <button type="submit"><i class="fas fa-plus"></i> Add Item</button>
+</form>
+
+<script>
+// Function to update date and time
+function updateDateTime() {
+    const now = new Date();
+    const options = {
+        year: 'numeric', month: 'short', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    };
+    const dateTimeString = now.toLocaleDateString('en-US', options);
+    document.getElementById('dateTime').innerText = dateTimeString;
+}
+setInterval(updateDateTime, 1000); // Update every second
+updateDateTime(); // Initial call
+
+document.getElementById('addItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const availableStock = document.getElementById('availableStock').value.trim();
+    const flavour = document.getElementById('flavour').value;
+    const weight = document.getElementById('weight').value;
+
+    if (name && availableStock && flavour && weight) {
+        const newItem = {
+            name,
+            availableStock,
+            sold: "0",
+            newStock: "0",
+            weight,
+            flavour
+        };
+
+        let stockData = JSON.parse(localStorage.getItem('stockData')) || [];
+        stockData.push(newItem);
+        localStorage.setItem('stockData', JSON.stringify(stockData));
+
+
+        window.location.href = 'nw.html'; // 👈 redirect back to dashboard
+    } else {
+        alert('Please fill all fields correctly.');
+    }
+});
+</script>
+
+</body>
+</html>
