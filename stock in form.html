@@ -85,6 +85,8 @@ button:hover {
     top: 30px;
     right:18px;
 }
+
+
 </style>
 </head>
 <body>
@@ -95,7 +97,7 @@ button:hover {
 </div>
 
 <form id="addItemForm">
-    <h2>Add New Cat Litter Item</h2>
+    <h2>Stock in</h2>
     <div class="l1">
         <label for="name">Item Name</label>
     </div>
@@ -160,8 +162,7 @@ document.getElementById('addItemForm').addEventListener('submit', function(e) {
         const newItem = {
             name,
             availableStock,
-            sold: "0",
-            newStock: "0",
+            Sellnumber,
             weight,
             flavour
         };
